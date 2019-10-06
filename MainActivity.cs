@@ -24,7 +24,6 @@ namespace InfoAboutPhone
 
             base.OnCreate(savedInstanceState);
             Platform.Init(this, savedInstanceState);
-            // Set our view from the "main" layout resource
             SetContentView(Resource.Layout.activity_main);
 
             buttonOK = FindViewById<Button>(Resource.Id.buttonOK);
@@ -40,18 +39,20 @@ namespace InfoAboutPhone
 
         private async void OnClickButtonOk(object o, EventArgs e)
         {
-            var IMEI = await GetIMEIAsync();
+            var IMEI = await GetIMEI();
 
             buttonOK.Text = $"Модель: {DeviceInfo.Model}\n" +
                         $"Производитель: {DeviceInfo.Manufacturer}\n" +
                         $"Название: {DeviceInfo.Name}\n" +
-                        $"Версия андроид: {DeviceInfo.VersionString}";
+                        $"Версия андроид: {DeviceInfo.VersionString}\n" +
+                        $"Язык интерфейса: {GetInterfaceLanguage()}\n" +
+                        $"ОЗУ: {GetTotalRAM()}ГБ";
 
             if (IMEI != null)
                 buttonOK.Text += $"\nIMEI: {IMEI}";
         }
 
-        public async Task<PermissionStatus> GetPermissionStatusAsync()
+        private async Task<PermissionStatus> GetPermissionStatusAsync()
         {
             // Подтверждение ограничения
             var status = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Phone);
@@ -66,16 +67,31 @@ namespace InfoAboutPhone
             return status;
         }
 
-        public async Task<string> GetIMEIAsync()
+        private async Task<string> GetIMEI()
         {
             var status = await GetPermissionStatusAsync();
             if (status == PermissionStatus.Granted)
             {
-                var manager = (TelephonyManager)GetSystemService(Context.TelephonyService);
+                var manager = GetSystemService(Context.TelephonyService) as TelephonyManager;
                 return manager.Imei;
             }
             else
                 return null;
         }
+
+        private string GetInterfaceLanguage()
+            => Java.Util.Locale.Default.ToString();
+
+        private double GetTotalRAM()
+        {
+            var activityManager = GetSystemService(Activity.ActivityService) as ActivityManager;
+            var memoryInfo = new ActivityManager.MemoryInfo();
+            activityManager.GetMemoryInfo(memoryInfo);
+
+            return ConvertToGB(memoryInfo.TotalMem);
+        }
+
+        private double ConvertToGB(double bytes)
+            => Math.Round(bytes / (double)(1024 * 1024 * 1024), 2);
     }
 }
