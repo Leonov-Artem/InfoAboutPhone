@@ -4,6 +4,7 @@ using Plugin.Permissions;
 using Plugin.Permissions.Abstractions;
 using Xamarin.Essentials;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace InfoAboutPhone
@@ -31,8 +32,11 @@ namespace InfoAboutPhone
         public double TotalRAM
             => GetTotalRAM();
 
-        public int CountSimCards
+        public int SimCardsCount
             => telephonyManager.PhoneCount;
+
+        public string API
+            => Android.OS.Build.VERSION.Sdk;
 
         public Info(TelephonyManager telephonyManager, ActivityManager activityManager)
         {

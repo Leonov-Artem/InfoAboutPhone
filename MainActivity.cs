@@ -52,7 +52,8 @@ namespace InfoAboutPhone
                         $"Версия андроид: {info.Version}\n" +
                         $"Язык интерфейса: {info.InterfaceLanguage}\n" +
                         $"ОЗУ: {info.TotalRAM}ГБ\n" +
-                        $"Слотов для сим-карт: {info.CountSimCards}";
+                        $"Слотов для сим-карт: {info.SimCardsCount}\n" +
+                        $"Уровень API: {info.API}";
 
             if (IMEI != null)
                 buttonOK.Text += $"\nIMEI: {IMEI}";
