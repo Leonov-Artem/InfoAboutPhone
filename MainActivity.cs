@@ -47,13 +47,14 @@ namespace InfoAboutPhone
             var IMEI = await info.IMEI();
 
             buttonOK.Text = $"Модель: {info.Model}\n" +
-                        $"Производитель: {info.Manufacturer}\n" +
-                        $"Название: {info.Name}\n" +
-                        $"Версия андроид: {info.Version}\n" +
-                        $"Язык интерфейса: {info.InterfaceLanguage}\n" +
-                        $"ОЗУ: {info.TotalRAM}ГБ\n" +
-                        $"Слотов для сим-карт: {info.SimCardsCount}\n" +
-                        $"Уровень API: {info.API}";
+                            $"Производитель: {info.Manufacturer}\n" +
+                            $"Название: {info.Name}\n" +
+                            $"Версия андроид: {info.Version}\n" +
+                            $"Язык интерфейса: {info.InterfaceLanguage}\n" +
+                            $"ОЗУ: {info.TotalRAM}ГБ\n" +
+                            $"Слотов для сим-карт: {info.SimCardsCount}\n" +
+                            $"Уровень API: {info.API}\n" +
+                            $"Время с момента включения: {info.TimeFromStart}ч.";
 
             if (IMEI != null)
                 buttonOK.Text += $"\nIMEI: {IMEI}";

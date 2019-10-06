@@ -6,6 +6,7 @@ using Xamarin.Essentials;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Android.OS;
 
 namespace InfoAboutPhone
 {
@@ -37,6 +38,9 @@ namespace InfoAboutPhone
 
         public string API
             => Android.OS.Build.VERSION.Sdk;
+
+        public double TimeFromStart
+            => Math.Round(SystemClock.ElapsedRealtime() * 2.78e-7, 2);
 
         public Info(TelephonyManager telephonyManager, ActivityManager activityManager)
         {
