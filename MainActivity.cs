@@ -92,6 +92,6 @@ namespace InfoAboutPhone
         }
 
         private double ConvertToGB(double bytes)
-            => Math.Round(bytes / (double)(1024 * 1024 * 1024), 2);
+            => Math.Ceiling(bytes / (1024 * 1024 * 1024));
     }
 }
