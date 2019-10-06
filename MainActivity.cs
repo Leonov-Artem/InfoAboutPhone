@@ -17,11 +17,16 @@ namespace InfoAboutPhone
     public class MainActivity : AppCompatActivity
     {
         private Button buttonOK;
+        private Info info;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
-            Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, savedInstanceState);
+            var telephonyManager = GetSystemService(Context.TelephonyService) as TelephonyManager;
+            var activityManager = GetSystemService(Activity.ActivityService) as ActivityManager;
+            info = new Info(telephonyManager, activityManager);
 
+            Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, savedInstanceState);
+            
             base.OnCreate(savedInstanceState);
             Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
@@ -39,59 +44,18 @@ namespace InfoAboutPhone
 
         private async void OnClickButtonOk(object o, EventArgs e)
         {
-            var IMEI = await GetIMEI();
+            var IMEI = await info.IMEI();
 
-            buttonOK.Text = $"Модель: {DeviceInfo.Model}\n" +
-                        $"Производитель: {DeviceInfo.Manufacturer}\n" +
-                        $"Название: {DeviceInfo.Name}\n" +
-                        $"Версия андроид: {DeviceInfo.VersionString}\n" +
-                        $"Язык интерфейса: {GetInterfaceLanguage()}\n" +
-                        $"ОЗУ: {GetTotalRAM()}ГБ";
+            buttonOK.Text = $"Модель: {info.Model}\n" +
+                        $"Производитель: {info.Manufacturer}\n" +
+                        $"Название: {info.Name}\n" +
+                        $"Версия андроид: {info.Version}\n" +
+                        $"Язык интерфейса: {info.InterfaceLanguage}\n" +
+                        $"ОЗУ: {info.TotalRAM}ГБ\n" +
+                        $"Слотов для сим-карт: {info.CountSimCards}";
 
             if (IMEI != null)
                 buttonOK.Text += $"\nIMEI: {IMEI}";
         }
-
-        private async Task<PermissionStatus> GetPermissionStatusAsync()
-        {
-            // Подтверждение ограничения
-            var status = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Phone);
-            if (status != PermissionStatus.Granted)
-            {
-                var results = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Phone);
-
-                if (results.ContainsKey(Permission.Phone))
-                    status = results[Permission.Phone];
-            }
-
-            return status;
-        }
-
-        private async Task<string> GetIMEI()
-        {
-            var status = await GetPermissionStatusAsync();
-            if (status == PermissionStatus.Granted)
-            {
-                var manager = GetSystemService(Context.TelephonyService) as TelephonyManager;
-                return manager.Imei;
-            }
-            else
-                return null;
-        }
-
-        private string GetInterfaceLanguage()
-            => Java.Util.Locale.Default.ToString();
-
-        private double GetTotalRAM()
-        {
-            var activityManager = GetSystemService(Activity.ActivityService) as ActivityManager;
-            var memoryInfo = new ActivityManager.MemoryInfo();
-            activityManager.GetMemoryInfo(memoryInfo);
-
-            return ConvertToGB(memoryInfo.TotalMem);
-        }
-
-        private double ConvertToGB(double bytes)
-            => Math.Ceiling(bytes / (1024 * 1024 * 1024));
     }
 }
