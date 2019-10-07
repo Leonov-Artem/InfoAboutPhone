@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.OS;
+using Java.Lang;
 
 namespace InfoAboutPhone
 {
@@ -16,10 +17,13 @@ namespace InfoAboutPhone
         ActivityManager activityManager;
 
         public string Model
-            => DeviceInfo.Model;
+            => Build.Model;
+
+        public string Brand
+            => Build.Brand;
 
         public string Manufacturer
-            => DeviceInfo.Manufacturer;
+            => Build.Manufacturer;
 
         public string Name
             => DeviceInfo.Name;
@@ -37,19 +41,21 @@ namespace InfoAboutPhone
             => telephonyManager.PhoneCount;
 
         public string API
-            => Android.OS.Build.VERSION.Sdk;
+            => Build.VERSION.Sdk;
 
         public double TimeFromStart
-            => Math.Round(SystemClock.ElapsedRealtime() * 2.78e-7, 2);
+            =>System.Math.Round(SystemClock.ElapsedRealtime() * 2.78e-7, 2);
 
         public string SerialNumber
             => Build.Serial;
 
+        public string CPUInfo
+            => t();
+
         public Info(TelephonyManager telephonyManager, ActivityManager activityManager)
         {
             this.telephonyManager = telephonyManager;
-            this.activityManager = activityManager;
-            
+            this.activityManager = activityManager;           
         }
 
         private async Task<PermissionStatus> GetPermissionStatusAsync()
@@ -86,6 +92,25 @@ namespace InfoAboutPhone
         }
 
         private double ConvertToGB(double bytes)
-            => Math.Ceiling(bytes / (1024 * 1024 * 1024));
+            => System.Math.Ceiling(bytes / (1024 * 1024 * 1024));
+
+        public string t()
+        {
+            string[] DATA = { "/system/bin/cat", "/proc/cpuinfo" };
+            var processBuilder = new ProcessBuilder(DATA);
+
+            Java.Lang.Process process = processBuilder.Start();
+
+            System.IO.Stream inputStream = process.InputStream;
+            byte[] byteArry = new byte[1024];
+            string output = "";
+
+            inputStream.Read(byteArry);
+            output += new Java.Lang.String(byteArry);
+
+            inputStream.Close();
+
+            return output;
+        }
     }
 }

@@ -8,11 +8,11 @@
     android:minWidth="25px"
     android:minHeight="25px">
 
-        <Button
-            android:id="@+id/buttonOK"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="get information">
-        </Button>
+    <TextView
+        android:text="Text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/infoDisplay" />
+
+
 </RelativeLayout>

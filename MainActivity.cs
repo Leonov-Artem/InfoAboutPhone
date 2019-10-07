@@ -10,6 +10,7 @@ using Plugin.Permissions.Abstractions;
 using Xamarin.Essentials;
 using System;
 using System.Threading.Tasks;
+using Java.Lang;
 
 namespace InfoAboutPhone
 {
@@ -17,6 +18,7 @@ namespace InfoAboutPhone
     public class MainActivity : AppCompatActivity
     {
         private Button buttonOK;
+        private TextView textView;
         private Info info;
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -31,8 +33,9 @@ namespace InfoAboutPhone
             Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
 
-            buttonOK = FindViewById<Button>(Resource.Id.buttonOK);
-            buttonOK.Click += OnClickButtonOk;
+            //buttonOK = FindViewById<Button>(Resource.Id.buttonOK);
+            textView = FindViewById<TextView>(Resource.Id.infoDisplay);
+            textView.Click += OnClickButtonOk;
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
@@ -46,8 +49,10 @@ namespace InfoAboutPhone
         {
             var IMEI = await info.IMEI();
 
-            buttonOK.Text = $"Модель: {info.Model}\n" +
+            //buttonOK.TextAlignment = Android.Views.TextAlignment.ViewStart;
+            textView.Text = $"Модель: {info.Model}\n" +
                             $"Производитель: {info.Manufacturer}\n" +
+                            $"Бренд: {info.Brand}\n" +
                             $"Название: {info.Name}\n" +
                             $"Версия андроид: {info.Version}\n" +
                             $"Язык интерфейса: {info.InterfaceLanguage}\n" +
@@ -55,10 +60,12 @@ namespace InfoAboutPhone
                             $"Слотов для сим-карт: {info.SimCardsCount}\n" +
                             $"Уровень API: {info.API}\n" +
                             $"Время с момента включения: {info.TimeFromStart}ч.\n" +
-                            $"Серийный номер: {Build.Serial}";
+                            $"Серийный номер: {info.SerialNumber}\n" +
+                            $"CPU: \n{info.CPUInfo}\n";
+
 
             if (IMEI != null)
-                buttonOK.Text += $"\nIMEI: {IMEI}";
+                textView.Text += $"\nIMEI: {IMEI}";
         }
     }
 }
