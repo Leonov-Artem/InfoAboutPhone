@@ -8,13 +8,17 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Android.OS;
 using Java.Lang;
+using Android.Net.Wifi;
+using System.Net.NetworkInformation;
+using System.Linq;
 
 namespace InfoAboutPhone
 {
     public class Info
     {
-        TelephonyManager telephonyManager;
-        ActivityManager activityManager;
+        private TelephonyManager telephonyManager;
+        private ActivityManager activityManager;
+        private WifiManager wifiManager;
 
         public string Model
             => Build.Model;
@@ -35,7 +39,15 @@ namespace InfoAboutPhone
             => Java.Util.Locale.Default.ToString();
 
         public double TotalRAM
-            => GetTotalRAM();
+        {
+            get
+            {
+                var memoryInfo = new ActivityManager.MemoryInfo();
+                activityManager.GetMemoryInfo(memoryInfo);
+
+                return ConvertToGB(memoryInfo.TotalMem);
+            }
+        }
 
         public int SimCardsCount
             => telephonyManager.PhoneCount;
@@ -50,12 +62,32 @@ namespace InfoAboutPhone
             => Build.Serial;
 
         public string CPUInfo
-            => GetCPUInfo();
+        {
+            get
+            {
+                string[] DATA = { "/system/bin/cat", "/proc/cpuinfo" };
+                var processBuilder = new ProcessBuilder(DATA);
 
-        public Info(TelephonyManager telephonyManager, ActivityManager activityManager)
+                Java.Lang.Process process = processBuilder.Start();
+
+                System.IO.Stream inputStream = process.InputStream;
+                var byteArry = new byte[1024];
+                string output = "";
+
+                inputStream.Read(byteArry);
+                output += new Java.Lang.String(byteArry);
+
+                inputStream.Close();
+
+                return output;
+            }
+        }
+
+        public Info(TelephonyManager telephonyManager, ActivityManager activityManager, WifiManager wifiManager)
         {
             this.telephonyManager = telephonyManager;
-            this.activityManager = activityManager;           
+            this.activityManager = activityManager;
+            this.wifiManager = wifiManager;
         }
 
         private async Task<PermissionStatus> GetPermissionStatusAsync()
@@ -83,34 +115,20 @@ namespace InfoAboutPhone
                 return null;
         }
 
-        private double GetTotalRAM()
-        {
-            var memoryInfo = new ActivityManager.MemoryInfo();
-            activityManager.GetMemoryInfo(memoryInfo);
-
-            return ConvertToGB(memoryInfo.TotalMem);
-        }
-
         private double ConvertToGB(double bytes)
             => System.Math.Ceiling(bytes / (1024 * 1024 * 1024));
 
-        public string GetCPUInfo()
+        public string GetMACAdress()
         {
-            string[] DATA = { "/system/bin/cat", "/proc/cpuinfo" };
-            var processBuilder = new ProcessBuilder(DATA);
-
-            Java.Lang.Process process = processBuilder.Start();
-
-            System.IO.Stream inputStream = process.InputStream;
-            byte[] byteArry = new byte[1024];
-            string output = "";
-
-            inputStream.Read(byteArry);
-            output += new Java.Lang.String(byteArry);
-
-            inputStream.Close();
-
-            return output;
+            //WifiInfo wInfo = wifiManager.ConnectionInfo;
+            //return wInfo.MacAddress;
+            var ni = NetworkInterface.GetAllNetworkInterfaces()
+                   .OrderBy(intf => intf.NetworkInterfaceType)
+                   .FirstOrDefault(intf => intf.OperationalStatus == OperationalStatus.Up
+                         && (intf.NetworkInterfaceType == NetworkInterfaceType.Wireless80211
+                             || intf.NetworkInterfaceType == NetworkInterfaceType.Ethernet));
+            var hw = ni.GetPhysicalAddress();
+            return string.Join(":", (from ma in hw.GetAddressBytes() select ma.ToString("X2")).ToArray());
         }
     }
 }

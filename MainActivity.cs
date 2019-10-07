@@ -11,6 +11,9 @@ using Xamarin.Essentials;
 using System;
 using System.Threading.Tasks;
 using Java.Lang;
+using Android.Hardware;
+using Android.Util;
+using Android.Net.Wifi;
 
 namespace InfoAboutPhone
 {
@@ -24,7 +27,8 @@ namespace InfoAboutPhone
         {
             var telephonyManager = GetSystemService(Context.TelephonyService) as TelephonyManager;
             var activityManager = GetSystemService(Activity.ActivityService) as ActivityManager;
-            info = new Info(telephonyManager, activityManager);
+            var wifiManager = GetSystemService(Context.WifiService) as WifiManager;
+            info = new Info(telephonyManager, activityManager, wifiManager);
 
             Plugin.CurrentActivity.CrossCurrentActivity.Current.Init(this, savedInstanceState);
             
@@ -59,9 +63,9 @@ namespace InfoAboutPhone
                             $"Уровень API: {info.API}\n" +
                             $"Время с момента включения: {info.TimeFromStart}ч.\n" +
                             $"Серийный номер: {info.SerialNumber}\n" +
-                            $"CPU: \n{info.CPUInfo}\n";
-
-
+                            $"CPU: \n============\n{info.CPUInfo}\n============";
+                            //$"MAC: {info.GetMACAdress()}";     
+            
             if (IMEI != null)
                 textView.Text += $"\nIMEI: {IMEI}";
         }
