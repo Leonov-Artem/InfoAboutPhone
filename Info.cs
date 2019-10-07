@@ -42,10 +42,14 @@ namespace InfoAboutPhone
         public double TimeFromStart
             => Math.Round(SystemClock.ElapsedRealtime() * 2.78e-7, 2);
 
+        public string SerialNumber
+            => Build.Serial;
+
         public Info(TelephonyManager telephonyManager, ActivityManager activityManager)
         {
             this.telephonyManager = telephonyManager;
             this.activityManager = activityManager;
+            
         }
 
         private async Task<PermissionStatus> GetPermissionStatusAsync()

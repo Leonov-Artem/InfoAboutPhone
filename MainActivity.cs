@@ -54,7 +54,8 @@ namespace InfoAboutPhone
                             $"ОЗУ: {info.TotalRAM}ГБ\n" +
                             $"Слотов для сим-карт: {info.SimCardsCount}\n" +
                             $"Уровень API: {info.API}\n" +
-                            $"Время с момента включения: {info.TimeFromStart}ч.";
+                            $"Время с момента включения: {info.TimeFromStart}ч.\n" +
+                            $"Серийный номер: {Build.Serial}";
 
             if (IMEI != null)
                 buttonOK.Text += $"\nIMEI: {IMEI}";
