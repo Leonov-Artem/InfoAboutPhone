@@ -17,7 +17,6 @@ namespace InfoAboutPhone
     [Activity(Label = "@string/app_name", Theme = "@style/AppTheme", MainLauncher = true)]
     public class MainActivity : AppCompatActivity
     {
-        private Button buttonOK;
         private TextView textView;
         private Info info;
 
@@ -33,9 +32,9 @@ namespace InfoAboutPhone
             Platform.Init(this, savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
 
-            //buttonOK = FindViewById<Button>(Resource.Id.buttonOK);
             textView = FindViewById<TextView>(Resource.Id.infoDisplay);
             textView.Click += OnClickButtonOk;
+            textView.TextSize = 20;
         }
 
         public override void OnRequestPermissionsResult(int requestCode, string[] permissions, [GeneratedEnum] Android.Content.PM.Permission[] grantResults)
@@ -49,7 +48,6 @@ namespace InfoAboutPhone
         {
             var IMEI = await info.IMEI();
 
-            //buttonOK.TextAlignment = Android.Views.TextAlignment.ViewStart;
             textView.Text = $"Модель: {info.Model}\n" +
                             $"Производитель: {info.Manufacturer}\n" +
                             $"Бренд: {info.Brand}\n" +

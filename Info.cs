@@ -50,7 +50,7 @@ namespace InfoAboutPhone
             => Build.Serial;
 
         public string CPUInfo
-            => t();
+            => GetCPUInfo();
 
         public Info(TelephonyManager telephonyManager, ActivityManager activityManager)
         {
@@ -94,7 +94,7 @@ namespace InfoAboutPhone
         private double ConvertToGB(double bytes)
             => System.Math.Ceiling(bytes / (1024 * 1024 * 1024));
 
-        public string t()
+        public string GetCPUInfo()
         {
             string[] DATA = { "/system/bin/cat", "/proc/cpuinfo" };
             var processBuilder = new ProcessBuilder(DATA);
